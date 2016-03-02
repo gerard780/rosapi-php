@@ -772,6 +772,30 @@ class RouterOS
 		
 		return count($this->tags) != 0;
 	}
+	
+	function staticlease($args = array(), $callback = FALSE) {
+		if($this->readOnly)
+			return TRUE;
+			
+		$res = $this->send('/ip/dhcp-server/lease', 'make-static', FALSE, $args, $callback);
+		
+		if($callback) {
+			return $res;
+		}
+		
+		switch($type = $this->response($ret)) {
+			case '!done':
+				return TRUE;
+				
+			case '!trap':
+				$this->trap($ret);
+				return FALSE;
+				
+			default:
+				echo("set: undefined type\n");
+				return FALSE;
+		}
+	}
 };
 
 //! @defgroup test Test section
